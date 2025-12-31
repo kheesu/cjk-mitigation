@@ -1,0 +1,31 @@
+# Model Weights & Checkpoints 
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.joblib
+/models/
+/checkpoints/
+
+# Datasets 
+/data/
+*.csv
+*.jsonl
+*.parquet
+*.h5
+
+# Python & Environment 
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Logs & Visualization 
+runs/
+wandb/
+*.log
+
