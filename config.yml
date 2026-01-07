@@ -1,0 +1,41 @@
+models:
+  llama-3.1-8b-inst:
+    full_name: "meta-llama/Llama-3.1-8B-Instruct"
+    learning_rate: "1e-4"
+    per_device_train_batch_size: 4
+    gradient_accumulation_steps: 4
+    max_length: 1024
+  llama-3.1-8b:
+    full_name: "meta-llama/Llama-3.1-8B"
+    learning_rate: "1e-4"
+    per_device_train_batch_size: 4
+    gradient_accumulation_steps: 4
+    max_length: 1024
+
+experiments:
+  llama-inst-bbq:
+    model: llama-3.1-8b-inst
+    dataset: bbq
+  llama-inst-cbbq:
+    model: llama-3.1-8b-inst
+    dataset: cbbq
+  llama-inst-jbbq:
+    model: llama-3.1-8b-inst
+    dataset: jbbq
+  llama-inst-kobbq:
+    model: llama-3.1-8b-inst
+    dataset: kobbq
+  llama-bbq:
+    model: llama-3.1-8b
+    dataset: bbq
+  llama-cbbq:
+    model: llama-3.1-8b
+    dataset: cbbq
+  llama-jbbq:
+    model: llama-3.1-8b
+    dataset: jbbq
+  llama-kobbq:
+    model: llama-3.1-8b
+    dataset: kobbq
+
+
