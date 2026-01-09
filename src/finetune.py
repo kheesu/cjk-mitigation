@@ -114,7 +114,7 @@ class Experiments:
                 train_dataset=dataset,
                 args=config,
                 data_collator=collator,
-                formatting_func=,
+                formatting_func=self._bbq_format_func,
             )
             trainer.train()
 
