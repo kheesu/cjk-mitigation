@@ -2,7 +2,7 @@ import os
 import yaml
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import SFTTrainer, SFTConfig
+from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
 from datasets import load_dataset
 import wandb
 
@@ -29,6 +29,7 @@ class Experiments:
             self.configs['experiments'] = {k: v for k, v in self.configs['experiments'].items() if k == experiment_name}
         return
 
+    @staticmethod
     def _bbq_format_func(example):
         """
         BBQ Dataset formatting function
@@ -102,10 +103,18 @@ class Experiments:
                 run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}"
             )
 
+            reponse_template = "Answer:"
+            collator = DataCollatorForCompletionOnlyLM(
+                response_template=response_template,
+                tokenizer=tokenizer
+            )
+
             trainer = SFTTrainer(
                 model=model,
                 train_dataset=dataset,
                 args=config,
+                data_collator=collator,
+                formatting_func=,
             )
             trainer.train()
 
