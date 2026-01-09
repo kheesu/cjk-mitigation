@@ -89,7 +89,7 @@ class Experiments:
         return text
 
     def finetune_all(self):
-        for _, experiment in self.configs['experiments'].items():
+        for experiment_name, experiment in self.configs['experiments'].items():
             model_name = experiment['model']
             model_full_name = self.configs['models'][model_name]['full_name']
             lr = float(self.configs['models'][model_name]['learning_rate'])
@@ -147,12 +147,12 @@ class Experiments:
             from datetime import date
             todaystr = date.today().strftime('%m-%d')
             config = SFTConfig(
-                output_dir=f"./checkpoints/{model_name}_{todaystr}",
+                output_dir=f"./checkpoints/{experiment_name}_{todaystr}",
                 per_device_train_batch_size=per_device_train_batch_size,
                 learning_rate=lr,
                 num_train_epochs=epochs,
                 report_to="wandb",
-                run_name=f"{model_name}_{todaystr}",
+                run_name=f"{experiment_name}_{todaystr}",
                 completion_only_loss=True,
                 gradient_checkpointing=True,
                 gradient_checkpointing_kwargs={'use_reentrant': False},
