@@ -24,9 +24,9 @@ class Experiments:
             raise ValueError("Couldn't load config")
             return -1
 
-    def filter(self, experiment_name=None):
+    def filter_experiment(self, experiment_name=None):
         if experiment_name is not None:
-            self.config['experiments'] = {k: v for k, v in config['experiments'].items() if k is experiment_name}
+            self.configs['experiments'] = {k: v for k, v in self.configs['experiments'].items() if k == experiment_name}
         return
 
     def _bbq_format_func(example):
@@ -36,7 +36,7 @@ class Experiments:
         output_texts = []
         for i in range(len(example['context'])):
             target_answer = ['A', 'B', 'C'][example['label'][i]]
-            text = f"{example['context'][i]}\n{example['question'][i]}\nA) {example['ans0'][i]}\nB) {example['ans1'][i]}\nC) {example['ans2']}\n\nAnswer: {target_answer}"
+            text = f"{example['context'][i]}\n{example['question'][i]}\nA) {example['ans0'][i]}\nB) {example['ans1'][i]}\nC) {example['ans2'][i]}\n\nAnswer: {target_answer}"
             output_texts.append(text)
 
         return output_texts
@@ -57,7 +57,7 @@ class Experiments:
                     "learning_rate": lr,
                     "architecture": model_name,
                     "dataset": experiment['dataset'],
-                    "epochs": expirement['epochs']
+                    "epochs": experiment['epochs']
                 }
 
             )
@@ -78,7 +78,7 @@ class Experiments:
                 dataset = load_dataset('json', data_files='data/BBQ/data/*.jsonl')
                 dataset = dataset['train']
                 if categories:
-                    dataset = dataset.filter(lambda x: x['category'] in category)
+                    dataset = dataset.filter(lambda x: x['category'] in categories)
             elif experiment['dataset'] == 'cbbq':
                 # CBBQ dataset from GitHub (requires downloading JSON files)
                 # Load from local data directory
@@ -94,12 +94,12 @@ class Experiments:
             from datetime import date
 
             config = SFTConfig(
-                output_dir=f"./checkpoints/{model_name}_{date.today().strftime("%m-%d")}",
+                output_dir=f"./checkpoints/{model_name}_{date.today().strftime('%%m-%%d')}",
                 per_device_train_batch_size=per_device_train_batch_size,
                 learning_rate=lr,
                 max_steps=1000,
                 report_to="wandb",
-                run_name=f"{model_name}_{date.today().strftime("%m-%d")}"
+                run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}"
             )
 
             trainer = SFTTrainer(
