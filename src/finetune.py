@@ -16,7 +16,7 @@ class Experiments:
 
     def load(self, config_path):
         with open(config_path, 'r') as fp:
-            config = yaml.load(fp)
+            config = yaml.load(fp, Loader=yaml.CLoader)
         if config is not None:
             self.configs = config
             return
