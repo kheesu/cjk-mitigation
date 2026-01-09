@@ -41,7 +41,7 @@ class Experiments:
         # Using the new Prompt-completion dataset style
         text = {
             "prompt": f"{example['context']}\n{example['question']}\nA) {example['ans0']}\nB) {example['ans1']}\nC) {example['ans2']}\n\nAnswer:",
-            "completion": f"{target_answer}",
+            "completion": f" {target_answer}",
         }
 
         return text
@@ -50,7 +50,7 @@ class Experiments:
         for _, experiment in self.configs['experiments'].items():
             model_name = experiment['model']
             model_full_name = self.configs['models'][model_name]['full_name']
-            lr = self.configs['models'][model_name]['learning_rate']
+            lr = float(self.configs['models'][model_name]['learning_rate'])
             per_device_train_batch_size = self.configs['models'][model_name]['per_device_train_batch_size']
             gradient_accumulation_steps = self.configs['models'][model_name]['gradient_accumulation_steps']
             max_length = self.configs['models'][model_name]['max_length']
@@ -113,7 +113,6 @@ class Experiments:
                 completion_only_loss=True,
             )
 
-            reponse_template = "Answer:"
 
             trainer = SFTTrainer(
                 model=model,
