@@ -2,7 +2,7 @@ import os
 import yaml
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
+from trl import SFTTrainer, SFTConfig
 from datasets import load_dataset
 import wandb
 
@@ -32,12 +32,16 @@ class Experiments:
     @staticmethod
     def _bbq_format_func(example):
         """
-        BBQ Dataset formatting function
+        BBQ Dataset formatting function using Prompt-completion style
         """
         output_texts = []
         for i in range(len(example['context'])):
             target_answer = ['A', 'B', 'C'][example['label'][i]]
-            text = f"{example['context'][i]}\n{example['question'][i]}\nA) {example['ans0'][i]}\nB) {example['ans1'][i]}\nC) {example['ans2'][i]}\n\nAnswer: {target_answer}"
+            # Using the new Prompt-completion dataset style
+            text = {
+                "prompt": f"{example['context'][i]}\n{example['question'][i]}\nA) {example['ans0'][i]}\nB) {example['ans1'][i]}\nC) {example['ans2'][i]}\n\nAnswer: ",
+                "completion": f"{target_answer}",
+            }
             output_texts.append(text)
 
         return output_texts
@@ -80,6 +84,7 @@ class Experiments:
                 dataset = dataset['train']
                 if categories:
                     dataset = dataset.filter(lambda x: x['category'] in categories)
+                dataset = dataset.map(self._bbq_format_func)
             elif experiment['dataset'] == 'cbbq':
                 # CBBQ dataset from GitHub (requires downloading JSON files)
                 # Load from local data directory
@@ -100,20 +105,16 @@ class Experiments:
                 learning_rate=lr,
                 max_steps=1000,
                 report_to="wandb",
-                run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}"
+                run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}",
+                completion_only_loss=True,
             )
 
             reponse_template = "Answer:"
-            collator = DataCollatorForCompletionOnlyLM(
-                response_template=response_template,
-                tokenizer=tokenizer
-            )
 
             trainer = SFTTrainer(
                 model=model,
                 train_dataset=dataset,
                 args=config,
-                data_collator=collator,
                 formatting_func=self._bbq_format_func,
             )
             trainer.train()
@@ -124,7 +125,7 @@ class Experiments:
 def main():
     
     experiments = Experiments('config.yml', 'llama-inst-bbq')
-
+    experiments.finetune_all()
 
 
 if __name__ == "__main__":
