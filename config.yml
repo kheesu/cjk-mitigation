@@ -29,21 +29,21 @@ experiments:
     model: llama-3.1-8b-inst
     dataset: kobbq
     epochs: 3
-  llama-bbq:
-    model: llama-3.1-8b
-    dataset: bbq
-    epochs: 3
-  llama-cbbq:
-    model: llama-3.1-8b
-    dataset: cbbq
-    epochs: 3
-  llama-jbbq:
-    model: llama-3.1-8b
-    dataset: jbbq
-    epochs: 3
-  llama-kobbq:
-    model: llama-3.1-8b
-    dataset: kobbq
-    epochs: 3
+  # llama-bbq:
+  #   model: llama-3.1-8b
+  #   dataset: bbq
+  #   epochs: 3
+  # llama-cbbq:
+  #   model: llama-3.1-8b
+  #   dataset: cbbq
+  #   epochs: 3
+  # llama-jbbq:
+  #   model: llama-3.1-8b
+  #   dataset: jbbq
+  #   epochs: 3
+  # llama-kobbq:
+  #   model: llama-3.1-8b
+  #   dataset: kobbq
+  #   epochs: 3
 
 

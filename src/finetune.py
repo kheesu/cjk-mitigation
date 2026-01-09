@@ -145,14 +145,14 @@ class Experiments:
                 dataset = load_dataset('naver-ai/kobbq')
 
             from datetime import date
-
+            todaystr = date.today().strftime('%m-%d')
             config = SFTConfig(
-                output_dir=f"./checkpoints/{model_name}_{date.today().strftime('%%m-%%d')}",
+                output_dir=f"./checkpoints/{model_name}_{todaystr}",
                 per_device_train_batch_size=per_device_train_batch_size,
                 learning_rate=lr,
                 num_train_epochs=epochs,
                 report_to="wandb",
-                run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}",
+                run_name=f"{model_name}_{todaystr}",
                 completion_only_loss=True,
                 gradient_checkpointing=True,
                 gradient_checkpointing_kwargs={'use_reentrant': False},
