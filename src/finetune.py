@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTTrainer, SFTConfig
+from peft import LoraConfig
 from datasets import load_dataset
 import wandb
 
@@ -55,17 +56,8 @@ class Experiments:
             gradient_accumulation_steps = self.configs['models'][model_name]['gradient_accumulation_steps']
             max_length = self.configs['models'][model_name]['max_length']
 
-            wandb.init(
-                entity="kheesu-sungkyunkwan-university",
-                project="cjk-finetune",
-                config={
-                    "learning_rate": lr,
-                    "architecture": model_name,
-                    "dataset": experiment['dataset'],
-                    "epochs": experiment['epochs']
-                }
-
-            )
+            os.environ['WANDB_PROJECT']='cjk-finetune'
+            os.environ['WANDB_ENTITIY']='kheesu-sungkyunkwan-university'
 
 
             model = AutoModelForCausalLM.from_pretrained(model_full_name)
@@ -111,13 +103,25 @@ class Experiments:
                 report_to="wandb",
                 run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}",
                 completion_only_loss=True,
+                gradient_checkpointing=True,
+                gradient_checkpointing_kwargs={'use_reentrant': False},
+                ddp_find_unused_parameters=False,
             )
 
-
+            peft_config = LoraConfig(
+                    r=16,
+                    lora_alpha=32,
+                    lora_dropout=0.05,
+                    bias="none",
+                    task_type="CAUSAL_LM",
+                    target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+            )
+            
             trainer = SFTTrainer(
                 model=model,
                 train_dataset=dataset,
                 args=config,
+                peft_config=peft_config,
             )
             trainer.train()
 
