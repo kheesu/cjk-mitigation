@@ -1,10 +1,13 @@
 import os
 import yaml
+from dotenv import load_dotenv
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTTrainer, SFTConfig
 from datasets import load_dataset
 import wandb
+
+load_dotenv()
 
 class Experiments:
     def __init__(self, config_path=None, name_filter=None):
@@ -34,20 +37,17 @@ class Experiments:
         """
         BBQ Dataset formatting function using Prompt-completion style
         """
-        output_texts = []
-        for i in range(len(example['context'])):
-            target_answer = ['A', 'B', 'C'][example['label'][i]]
-            # Using the new Prompt-completion dataset style
-            text = {
-                "prompt": f"{example['context'][i]}\n{example['question'][i]}\nA) {example['ans0'][i]}\nB) {example['ans1'][i]}\nC) {example['ans2'][i]}\n\nAnswer: ",
-                "completion": f"{target_answer}",
-            }
-            output_texts.append(text)
+        target_answer = ['A', 'B', 'C'][example['label']]
+        # Using the new Prompt-completion dataset style
+        text = {
+            "prompt": f"{example['context']}\n{example['question']}\nA) {example['ans0']}\nB) {example['ans1']}\nC) {example['ans2']}\n\nAnswer:",
+            "completion": f"{target_answer}",
+        }
 
-        return output_texts
+        return text
 
     def finetune_all(self):
-        for experiment in self.configs['experiments']:
+        for _, experiment in self.configs['experiments'].items():
             model_name = experiment['model']
             model_full_name = self.configs['models'][model_name]['full_name']
             lr = self.configs['models'][model_name]['learning_rate']
@@ -70,6 +70,8 @@ class Experiments:
 
             model = AutoModelForCausalLM.from_pretrained(model_full_name)
             tokenizer = AutoTokenizer.from_pretrained(model_full_name)
+            # Hard-coding this for right now
+            tokenizer.pad_token = tokenizer.eos_token
 
             # Load datasets
             if 'categories' not in experiment.keys():
@@ -85,6 +87,8 @@ class Experiments:
                 if categories:
                     dataset = dataset.filter(lambda x: x['category'] in categories)
                 dataset = dataset.map(self._bbq_format_func)
+                # Keep only the prompt-competion columns
+                dataset = dataset.remove_columns([col for col in dataset.column_names if col not in ['prompt', 'completion']])
             elif experiment['dataset'] == 'cbbq':
                 # CBBQ dataset from GitHub (requires downloading JSON files)
                 # Load from local data directory
@@ -115,7 +119,6 @@ class Experiments:
                 model=model,
                 train_dataset=dataset,
                 args=config,
-                formatting_func=self._bbq_format_func,
             )
             trainer.train()
 
