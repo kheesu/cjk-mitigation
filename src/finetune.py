@@ -96,6 +96,7 @@ class Experiments:
             per_device_train_batch_size = self.configs['models'][model_name]['per_device_train_batch_size']
             gradient_accumulation_steps = self.configs['models'][model_name]['gradient_accumulation_steps']
             max_length = self.configs['models'][model_name]['max_length']
+            epochs = experiment['epochs']
 
             os.environ['WANDB_PROJECT']='cjk-finetune'
             os.environ['WANDB_ENTITIY']='kheesu-sungkyunkwan-university'
@@ -149,7 +150,7 @@ class Experiments:
                 output_dir=f"./checkpoints/{model_name}_{date.today().strftime('%%m-%%d')}",
                 per_device_train_batch_size=per_device_train_batch_size,
                 learning_rate=lr,
-                max_steps=1000,
+                num_train_epochs=epochs,
                 report_to="wandb",
                 run_name=f"{model_name}_{date.today().strftime('%%m-%%d')}",
                 completion_only_loss=True,
