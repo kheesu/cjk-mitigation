@@ -13,10 +13,10 @@ models:
     max_length: 1024
 
 experiments:
-  llama-inst-bbq:
-    model: llama-3.1-8b-inst
-    dataset: bbq
-    epochs: 3
+  #  llama-inst-bbq:
+  #    model: llama-3.1-8b-inst
+  #    dataset: bbq
+  #    epochs: 3
   llama-inst-cbbq:
     model: llama-3.1-8b-inst
     dataset: cbbq

@@ -128,7 +128,7 @@ class Experiments:
                 dataset = dataset['train']
                 if categories:
                     dataset = dataset.filter(lambda x: x['category'] in categories)
-                dataset = dataset.map(self._bbq_format_func)
+                dataset = dataset.map(self._cbbq_format_func)
                 # Keep only the prompt-competion columns
                 dataset = dataset.remove_columns([col for col in dataset.column_names if col not in ['prompt', 'completion']])
             elif experiment['dataset'] == 'jbbq':
@@ -137,12 +137,17 @@ class Experiments:
                 dataset = dataset['train']
                 if categories:
                     dataset = dataset.filter(lambda x: x['category'] in categories)
-                dataset = dataset.map(self._bbq_format_func)
+                dataset = dataset.map(self._jbbq_format_func)
                 # Keep only the prompt-competion columns
                 dataset = dataset.remove_columns([col for col in dataset.column_names if col not in ['prompt', 'completion']])
             elif experiment['dataset'] == 'kobbq':
                 # KoBBQ dataset from Hugging Face
                 dataset = load_dataset('naver-ai/kobbq')
+                dataset = dataset['test']
+                if categories:
+                    dataset = dataset.filter(lambda x: x['category'] in categories)
+                dataset = dataset.map(self._kobbq_format_func)
+                dataset = dataset.remove_columns([col for col in dataset.column_names if col not in ['prompt', 'completion']])
 
             from datetime import date
             todaystr = date.today().strftime('%m-%d')
